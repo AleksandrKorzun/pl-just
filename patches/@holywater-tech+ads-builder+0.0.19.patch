@@ -1,0 +1,113 @@
+diff --git a/node_modules/@holywater-tech/ads-builder/framework/App.js b/node_modules/@holywater-tech/ads-builder/framework/App.js
+index e006bf9..6aa4878 100644
+--- a/node_modules/@holywater-tech/ads-builder/framework/App.js
++++ b/node_modules/@holywater-tech/ads-builder/framework/App.js
+@@ -18,6 +18,8 @@ import Preloader from './Preloader';
+ import Game from '../../../../src/Game';
+ 
+ import Utils from './Utils';
++import Moloco from '@holywater-tech/ads-builder/networks/Moloco';
++import Snapchat from '@holywater-tech/ads-builder/networks/Snapchat';
+ 
+ let network;
+ 
+@@ -242,6 +244,10 @@ if (window.App.network === 'Applovin') {
+     network = new Applovin(start);
+ } else if (window.App.network === 'Facebook') {
+     network = new Facebook(start);
++} else if (window.App.network === 'Moloco') {
++    network = new Moloco(start);
++} else if (window.App.network === 'Snapchat') {
++    network = new Snapchat(start);
+ } else if (window.App.network === 'Google') {
+     network = new Google(start);
+ } else if (window.App.network === 'IronSource') {
+diff --git a/node_modules/@holywater-tech/ads-builder/networks/IronSource.js b/node_modules/@holywater-tech/ads-builder/networks/IronSource.js
+index dd706ed..ccbd285 100644
+--- a/node_modules/@holywater-tech/ads-builder/networks/IronSource.js
++++ b/node_modules/@holywater-tech/ads-builder/networks/IronSource.js
+@@ -33,7 +33,11 @@ export default class IronSource extends Network {
+             this.game.resize();
+         });
+ 
+-        dapi.addEventListener('audioVolumeChange', () => {});
++        dapi.addEventListener('audioVolumeChange', (volume) => {
++            let isAudioEnabled = !!volume;
++            this.game.sound.setMute(isAudioEnabled)
++            
++        });
+     }
+ 
+     openStore() {
+diff --git a/node_modules/@holywater-tech/ads-builder/networks/Moloco.js b/node_modules/@holywater-tech/ads-builder/networks/Moloco.js
+new file mode 100644
+index 0000000..e46a956
+--- /dev/null
++++ b/node_modules/@holywater-tech/ads-builder/networks/Moloco.js
+@@ -0,0 +1,9 @@
++/* global window */
++
++import Network from './Network';
++
++export default class Moloco extends Network {
++    openStore() {
++        window.FbPlayableAd ? window.FbPlayableAd.onCTAClick() : window.top.open(this.getUrl());
++    }
++}
+diff --git a/node_modules/@holywater-tech/ads-builder/networks/Snapchat.js b/node_modules/@holywater-tech/ads-builder/networks/Snapchat.js
+new file mode 100644
+index 0000000..7a256be
+--- /dev/null
++++ b/node_modules/@holywater-tech/ads-builder/networks/Snapchat.js
+@@ -0,0 +1,9 @@
++/* global window */
++
++import Network from './Network';
++
++export default class Snapchat extends Network {
++    openStore() {
++        window.snapchatCta ? window.snapchatCta() : window.top.open(this.getUrl());
++    }
++}
+diff --git a/node_modules/@holywater-tech/ads-builder/networks/UnityAds.js b/node_modules/@holywater-tech/ads-builder/networks/UnityAds.js
+index d59e061..01555e8 100644
+--- a/node_modules/@holywater-tech/ads-builder/networks/UnityAds.js
++++ b/node_modules/@holywater-tech/ads-builder/networks/UnityAds.js
+@@ -3,6 +3,37 @@
+ import Network from './Network';
+ 
+ export default class UnityAds extends Network {
++    constructor(callback) {
++        
++        super();
++        this.callback = callback;
++        this.onDapiReadyCallbackBind = this.onDapiReadyCallback.bind(this);
++        window.mraid.getState() === 'loading' ? window.mraid.addEventListener('ready', this.onDapiReadyCallbackBind) : this.onDapiReadyCallback();
++    }
++
++    onDapiReadyCallback() {
++        window.mraid.removeEventListener('ready', this.onDapiReadyCallbackBind);
++
++
++        if (window.mraid.isViewable()) {
++            setTimeout(() => {
++                this.callback();
++            }, 500);
++        } else {
++            window.mraid.addEventListener('viewableChange', () => {
++                setTimeout(() => {
++                    this.callback();
++                }, 500);
++            });
++        }
++
++        window.mraid.addEventListener('sizeChange', () => {
++            this.game.resize();
++        });
++
++
++    }
++
+     openStore() {
+         window.mraid ? window.mraid.open(this.getUrl()) : window.top.open(this.getUrl());
+     }
