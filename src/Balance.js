@@ -37,9 +37,9 @@ export default class Balance extends Phaser.GameObjects.Container {
       .setAlpha(1)
       .setOrigin(0.5, 0.5);
     this.coinText = this.scene.add
-      .text(-200, 0, `$ ${this.numberWithCommas(this.scene.totalCoins)}`, {
-        font: `bold 250px Roboto-Medium`,
-        fill: "#000",
+      .text(-730, 0, `$ ${this.numberWithCommas(this.scene.totalCoins)}`, {
+        font: `bold 200px Roboto-Medium`,
+        fill: "#003087",
         // shadow: {
         //   offsetX: 5,
         //   offsetY: 5,
@@ -49,12 +49,12 @@ export default class Balance extends Phaser.GameObjects.Container {
         //   fill: true,
         // },
         letterSpacing: 10,
-        stroke: "#012f59",
+        // stroke: "#012f59",
         strokeThickness: 5,
       })
       .setDepth(120)
       .setAlpha(1)
-      .setOrigin(0.5, 0.5);
+      .setOrigin(0, 0.5);
     this.add([this.coinText, this.box]);
     this._sort();
   }
@@ -73,11 +73,11 @@ export default class Balance extends Phaser.GameObjects.Container {
       duration,
       onUpdate: (tween) => {
         // this.coinText.text = tween.getValue();
-        if (tween.getValue() < 0) {
-          this.coinText.setFill("#f51105");
-        } else {
-          this.coinText.setFill("#000");
-        }
+        // if (tween.getValue() < 0) {
+        //   this.coinText.setFill("#f51105");
+        // } else {
+        //   this.coinText.setFill("#000");
+        // }
         this.coinText.text = `$ ${this.numberWithCommas(
           Math.floor(tween.getValue())
         )}`;

@@ -14,6 +14,7 @@ import Items from "./Items";
 import { EVENTS, SCENE } from "./constants/Constants";
 import Balance from "./Balance";
 import Woman from "./Woman";
+import Utils from "@holywater-tech/ads-builder/framework/Utils";
 
 export default class Game extends ParentScene {
   create() {
@@ -26,6 +27,7 @@ export default class Game extends ParentScene {
     this.onSwitchScene(SCENE[this.sceneNum]);
     this.addCharacter();
     this.addBalance();
+    Utils.addAudio(this, "music_trivia", true, 0.5);
     // setTimeout(() => {
     //   this.finalScene();
     // }, 2000);
@@ -87,7 +89,7 @@ export default class Game extends ParentScene {
     }
   }
   finalScene() {
-    this.bg.changeBackground("bg", true, [1.5, 1.5, 1.2, 1.2]);
+    this.bg.changeBackground("bg2", true, [1.5, 1.5, 1.1, 1.1]);
     this.game.network.addClickToStore(this.bg);
     this.uiContainer?.removeItems();
     this.tweens.add({
@@ -96,7 +98,10 @@ export default class Game extends ParentScene {
       duration: 200,
       delay: 200,
       onComplete: () => {
-        this.balance.setCustomAlign("Center").setCustomPosition(0, 150, 0, 100);
+        this.balance
+          .setCustomAlign("Center")
+          .setCustomPosition(0, 150, 0, 100)
+          .setCustomScale(0.18, 0.18, 0.15, 0.15);
         this.logo
           .setCustomAlign("Center")
           .setCustomPosition(0, -300, 0, -300)
@@ -154,6 +159,14 @@ export default class Game extends ParentScene {
       .setOrigin(0.5, 0.5)
       .setCustomScale(0.7, 0.7, 0.4, 0.4)
       .setCustomPosition(200, 80, 110, 80);
+    this.title_m = this.add
+      .image(0, 0, "title")
+      .addProperties(["pos", "scale"])
+      .setDepth(77)
+      .setCustomAlign("Bottom")
+      .setOrigin(0.5, 0.5)
+      .setCustomScale(0.3, 0.3, 0.3, 0.3)
+      .setCustomPosition(0, -25, 0, -25);
 
     this.download = this.add
       .image(0, 0, "atlas", "cta")
@@ -162,7 +175,7 @@ export default class Game extends ParentScene {
       .setCustomAlign("Bottom")
       .setOrigin(0.5, 0.5)
       .setCustomScale(0.6, 0.6, 0.6, 0.6)
-      .setCustomPosition(0, -70, 0, -70);
+      .setCustomPosition(0, -80, 0, -80);
     this.download.setInteractive().on("pointerdown", this.openStore, this);
     this.tweens.add({
       targets: this.download,
@@ -174,7 +187,7 @@ export default class Game extends ParentScene {
     });
     // this.download.setInteractive().on('pointerdown', this.scene.openStore, this.scene);
 
-    this.mainContainer.add([this.logo, this.download]);
+    this.mainContainer.add([this.logo, this.download, this.title_m]);
     this.sort();
   }
 
